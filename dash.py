@@ -389,7 +389,7 @@ def get_cached_data():
 data_cache = get_cached_data()
 
 # App header
-st.title("Token Relations Dashboard 📊")
+st.markdown("<h1 style='color: black;'>Token Relations Dashboard 📊</h1>", unsafe_allow_html=True)
 
 # Display last updated time
 if data_cache["last_updated"]:
