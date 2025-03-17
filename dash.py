@@ -77,13 +77,17 @@ BLOCKCHAIN_MAPPING = {
 }
 
 # Database setup
-DB_PATH = "blockchain_data.db"
-
 def setup_database():
     """Create database and tables if they don't exist"""
     # Check if running on Streamlit Cloud
     if os.getenv('STREAMLIT_RUNTIME'):
-        DB_PATH = "/tmp/blockchain_data.db"  # Use /tmp directory on Streamlit Cloud
+        db_path = "/tmp/blockchain_data.db"  # Use /tmp directory on Streamlit Cloud
+    else:
+        db_path = "blockchain_data.db"  # Local development path
+    
+    # Make DB_PATH available globally
+    global DB_PATH
+    DB_PATH = db_path
     
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -122,6 +126,7 @@ def setup_database():
     conn.close()
 
 # Initialize database
+DB_PATH = None  # Will be set by setup_database()
 setup_database()
 
 # Cache for data
