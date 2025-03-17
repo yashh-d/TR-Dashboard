@@ -23,11 +23,18 @@ st.set_page_config(
 st.markdown("""
 <style>
     .main {
-        background-color: #f5f7f9;
+        background-color: #FFFFFF !important;
     }
     .stApp {
+        background-color: #FFFFFF !important;
         max-width: 1200px;
         margin: 0 auto;
+    }
+    .st-emotion-cache-1wrcr25 {
+        background-color: #FFFFFF !important;
+    }
+    .st-emotion-cache-6qob1r {
+        background-color: #FFFFFF !important;
     }
     h1, h2, h3, h4 {
         color: #000000;
