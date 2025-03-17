@@ -81,6 +81,10 @@ DB_PATH = "blockchain_data.db"
 
 def setup_database():
     """Create database and tables if they don't exist"""
+    # Check if running on Streamlit Cloud
+    if os.getenv('STREAMLIT_RUNTIME'):
+        DB_PATH = "/tmp/blockchain_data.db"  # Use /tmp directory on Streamlit Cloud
+    
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -363,40 +367,14 @@ def update_data():
     # Update the last updated time in the database
     update_last_updated_time(current_time)
 
-# Background update task
-def background_update():
-    while True:
-        update_data()
-        time.sleep(3600)  # Update every hour
+# Replace the background update with cached functions
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def get_cached_data():
+    update_data()
+    return data_cache
 
-# Start the background update thread when the app starts
-if "thread_started" not in st.session_state:
-    # Check if we already have data in the database
-    last_updated = get_last_updated_time()
-    
-    # If we have data that was updated in the last hour, load it from the database
-    if last_updated and (datetime.now(pytz.UTC) - last_updated).total_seconds() < 3600:
-        # Load data from database
-        tvl_data = {}
-        price_data = {}
-        
-        for blockchain in BLOCKCHAIN_MAPPING.keys():
-            tvl_data[blockchain] = get_tvl_data_from_db(blockchain)
-            price_data[blockchain] = get_price_data_from_db(blockchain)
-        
-        data_cache = {
-            "tvl_data": tvl_data,
-            "price_data": price_data,
-            "last_updated": last_updated
-        }
-    else:
-        # If we don't have recent data, fetch it
-        update_data()
-    
-    # Start background thread
-    update_thread = threading.Thread(target=background_update, daemon=True)
-    update_thread.start()
-    st.session_state.thread_started = True
+# Then in your main app code, replace the thread initialization with:
+data_cache = get_cached_data()
 
 # App header
 st.title("Token Relations Dashboard 📊")
